@@ -10,7 +10,7 @@ import SceneKit
 import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate {
-
+    
     @IBOutlet var sceneView: ARSCNView!
     
     override func viewDidLoad() {
@@ -22,21 +22,42 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
         
-        // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+        // Create new 3D object
+//        let sphere = SCNSphere(radius: 0.2)
+//        let cube = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.01)
+//
+//        let material = SCNMaterial()
+//        material.diffuse.contents = UIImage(named: "art.scnassets/moon.jpeg")
+//
+//        sphere.materials = [material]
+//
+//        let node = SCNNode()
+//        node.position = SCNVector3(x: 0, y: 0.1, z: -0.5)
+//        node.geometry = sphere
+//
+//        sceneView.scene.rootNode.addChildNode(node)
+//        sceneView.autoenablesDefaultLighting = true
         
-        // Set the scene to the view
-        sceneView.scene = scene
+        // Create a new scene
+        guard let diceScene = SCNScene(named: "art.scnassets/diceCollada.scn") else {
+            fatalError()
+        }
+        if let diceNode = diceScene.rootNode.childNode(withName: "Dice", recursively: true) {
+            diceNode.position = SCNVector3(x: 0, y: 0, z: -0.1)
+            sceneView.scene.rootNode.addChildNode(diceNode)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        // Create a session configuration
-        let configuration = ARWorldTrackingConfiguration()
+        if ARWorldTrackingConfiguration.isSupported {
+            
+            // Create a session configuration
+            let configuration = ARWorldTrackingConfiguration()
 
-        // Run the view's session
-        sceneView.session.run(configuration)
+            // Run the view's session
+            sceneView.session.run(configuration)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -44,31 +65,5 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Pause the view's session
         sceneView.session.pause()
-    }
-
-    // MARK: - ARSCNViewDelegate
-    
-/*
-    // Override to create and configure nodes for anchors added to the view's session.
-    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        let node = SCNNode()
-     
-        return node
-    }
-*/
-    
-    func session(_ session: ARSession, didFailWithError error: Error) {
-        // Present an error message to the user
-        
-    }
-    
-    func sessionWasInterrupted(_ session: ARSession) {
-        // Inform the user that the session has been interrupted, for example, by presenting an overlay
-        
-    }
-    
-    func sessionInterruptionEnded(_ session: ARSession) {
-        // Reset tracking and/or remove existing anchors if consistent tracking is required
-        
     }
 }
